@@ -69,7 +69,7 @@ const AuthForm = () => {
 
   const register = async (firstName, lastName, email, password) => {
     try {
-      const response = await fetch(`${authUrl}/login`, {
+      const response = await fetch(`${authUrl}/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -171,17 +171,20 @@ const AuthForm = () => {
             onChange={passwordChangeHandler}
           />
           <div className={classes.actions}>
-            {!isLoading && <Button onClick={submitHandler}>
-              {isLogin ? "Login" : "Create Account"}
-            </Button>}
+            {!isLoading && <Fragment>
+              <Button onClick={submitHandler}>
+                {isLogin ? "Login" : "Create Account"}
+              </Button>
+
+              <Button
+                type="button"
+                className={classes.toggle}
+                onClick={switchAuthModeHandler}
+              >
+                {isLogin ? "Create new account" : "Login with existing account"}
+              </Button>
+            </Fragment>}
             {isLoading && <p>Sending request...</p>}
-            <Button
-              type="button"
-              className={classes.toggle}
-              onClick={switchAuthModeHandler}
-            >
-              {isLogin ? "Create new account" : "Login with existing account"}
-            </Button>
           </div>
         </form>
       </section>

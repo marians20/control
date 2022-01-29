@@ -10,7 +10,6 @@ export default async function login(req, res) {
     try {
       const users = db.use('users');
 
-      // TODO - learn about CouchDb search or query documents
       const existingUser = (await users.find({
         selector: {
           email: {"$eq": email}

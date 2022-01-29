@@ -4,9 +4,19 @@ import bcrypt from 'bcryptjs';
 
 export default async function register(req, res) {
     if (req.method === 'POST') {
-        console.log(req.body);
         const { email, password } = req.body;
         const users = db.use('users');
+
+        const existingUser = (await users.find({
+            selector: {
+                email: { "$eq": email }
+            }
+        })).docs[0];
+
+        if(existingUser) {
+            return res.status(404).json({ message: 'Email already registered.'});
+        }
+
         const newUser = {
             ...req.body,
             password: await bcrypt.hash(password, 10)
