@@ -13,6 +13,10 @@
     color: white;
     font-weight: bold;
   }
+
+  .link {
+    cursor: pointer;
+  }
   
   .header ul {
     list-style: none;
@@ -27,7 +31,7 @@
     color: #fcb8d2;
   }
   
-  .header a {
+  .header a, .link {
     text-decoration: none;
     font-size: 1.5rem;
     color: #fcb8d2;
@@ -35,7 +39,8 @@
   
   .header a:hover,
   .header a:active,
-  .header a.active {
+  .header a.active,
+  .header.link:hover {
     color: white;
   }
   

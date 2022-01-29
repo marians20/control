@@ -1,11 +1,17 @@
 import { useContext, Fragment } from 'react';
 import Link from 'next/link';
 import AuthContext from '../../store/auth-context';
-import classes from './MainNavigation.module.css';
 import Thermometer from '../thermometer/Thermometer';
+
+import classes from './MainNavigation.module.css';
 
 function MainNavigation() {
     const context = useContext(AuthContext);
+
+    function clickLogoutHandler() {
+        context.logout();
+    }
+
     return (
         <header className={classes.header}>
             <div className={classes.logo}>
@@ -25,7 +31,7 @@ function MainNavigation() {
                                 <Thermometer />
                             </li>
                             <li>
-                                <Link href='/logout'>{context.email}</Link>
+                                <div className={classes.link} onClick={clickLogoutHandler}>{context.email}</div>
                             </li>
                         </Fragment>
                     }
