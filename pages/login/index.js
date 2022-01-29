@@ -1,15 +1,24 @@
 import { useRouter } from 'next/router';
-import { useContext, useRef, useState, Fragment } from 'react';
+import { useContext, useState, Fragment } from 'react';
+
+import Container from '@mui/material/Container';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
+
 import AuthContext from '../../store/auth-context';
 import classes from "./AuthForm.module.css";
+
+const initialFormData = {
+  firstName: '',
+  lastName: '',
+  email: '',
+  password: ''
+};
 
 const authUrl = '/api';
 const AuthForm = () => {
   const history = useRouter();
-  const emailInputRef = useRef();
-  const passwordInputRef = useRef();
-  const firstNameInputRef = useRef();
-  const lastNameInputRef = useRef();
+  const [formData, setFormData] = useState(initialFormData);
 
   const authContext = useContext(AuthContext);
 
@@ -21,16 +30,8 @@ const AuthForm = () => {
   };
 
   const clearForm = () => {
-    emailInputRef.current.value = '';
-    passwordInputRef.current.value = '';
-
-    if (!isLogin) {
-      firstNameInputRef.current.value = '';
-      lastNameInputRef.current.value = '';
-    }
+    setFormData(initialFormData);
   }
-
-
 
   const login = async (email, password) => {
     try {
@@ -51,10 +52,10 @@ const AuthForm = () => {
         throw data || 'Authentication failed!';
       }
 
-      
       authContext.login(data.token, email);
       history.replace('/');
     } catch (err) {
+      setFormData(current => ({ ...current, password: '' }));
       console.log(err);
       if (err.message) {
         alert(err.message);
@@ -103,88 +104,89 @@ const AuthForm = () => {
 
   const submitHandler = async (event) => {
     event.preventDefault();
-    const enteredEmail = emailInputRef.current.value;
-    const enteredPassword = passwordInputRef.current.value;
-      //optional: add validation
-      setIsLoading(true);
-      if (isLogin) {
-        await login(enteredEmail, enteredPassword);
-      } else {
-        const enteredFirstName = firstNameInputRef.current.value;
-        const enteredLastName = lastNameInputRef.current.value;
-        await register(firstName, lastName, enteredEmail, enteredPassword);
-        // fetch(`${authUrl}/register`, {
-        //   method: 'POST',
-        //   headers: {
-        //     'Content-Type': 'application/json'
-        //   },
-        //   body: JSON.stringify({
-        //     first_name: enteredFirstName,
-        //     last_name: enteredLastName,
-        //     email: enteredEmail,
-        //     password: enteredPassword
-        //   })
-        // }).then(response => {
-        //   if (response.ok) {
-        //     return response.json().then(data => {
-        //       clearForm();
-        //       authContext.login(data.token, enteredEmail);
-        //       history.replace('/');
-        //     });
-        //   } else {
-        //     return response.json().then(data => {
-        //       alert(data.message);
-        //     });
-        //   }
-        // }).catch(err => {
-        //   alert(err.message);
-        // }).finally(() => setIsLoading(false));
-      }
-    };
 
-    return (
-      <section className={classes.auth}>
+    setIsLoading(true);
+    if (isLogin) {
+      await login(formData.email, formData.password);
+    } else {
+      await register(formData.firstName, formData.lastName, formData.email, formData.password);
+    }
+  };
+
+  const firstNameChangeHandler = (event) =>
+    setFormData(current => ({ ...current, firstName: event.target.value }));
+
+  const lastNameChangeHandler = (event) =>
+    setFormData(current => ({ ...current, lastName: event.target.value }));
+
+  const emailChangeHandler = (event) =>
+    setFormData(current => ({ ...current, email: event.target.value }));
+
+  const passwordChangeHandler = (event) =>
+    setFormData(current => ({ ...current, password: event.target.value }));
+
+  return (
+    <Container className={classes.container}>
+      <header>
         <h1>{isLogin ? "Login" : "Sign Up"}</h1>
-        <form onSubmit={submitHandler}>
+      </header>
+      <section>
+        <form onSubmit={submitHandler} className={classes.inputs}>
           {!isLogin && (
             <Fragment>
-              <div className={classes.control}>
-                <label htmlFor="firstName">First Name</label>
-                <input type="text" id="firstName" ref={firstNameInputRef} required />
-              </div>
-              <div className={classes.control}>
-                <label htmlFor="lastName">Last Name</label>
-                <input type="text" id="lastName" ref={lastNameInputRef} required />
-              </div>
+              <TextField
+                required
+                id="firstName"
+                label="First Name"
+                className={classes['text-field']}
+                value={formData.firstName}
+                onChange={firstNameChangeHandler}
+              />
+              <TextField
+                required
+                id="lastName"
+                label="Last Name"
+                className={classes['text-field']}
+                value={formData.lastName}
+                onChange={lastNameChangeHandler}
+              />
             </Fragment>
           )}
-          <div className={classes.control}>
-            <label htmlFor="email">Your Email</label>
-            <input type="email" id="email" ref={emailInputRef} required />
-          </div>
-          <div className={classes.control}>
-            <label htmlFor="password">Your Password</label>
-            <input
-              type="password"
-              id="password"
-              ref={passwordInputRef}
-              required
-            />
-          </div>
+          <TextField
+            required
+            id="email"
+            label="Email"
+            type="email"
+            className={classes['text-field']}
+            value={formData.email}
+            onChange={emailChangeHandler}
+          />
+          <TextField
+            required
+            id="password"
+            label="Password"
+            type="password"
+            className={classes['text-field']}
+            value={formData.password}
+            onChange={passwordChangeHandler}
+          />
           <div className={classes.actions}>
-            {!isLoading && <button>{isLogin ? "Login" : "Create Account"}</button>}
+            {!isLoading && <Button onClick={submitHandler}>
+              {isLogin ? "Login" : "Create Account"}
+            </Button>}
             {isLoading && <p>Sending request...</p>}
-            <button
+            <Button
               type="button"
               className={classes.toggle}
               onClick={switchAuthModeHandler}
             >
               {isLogin ? "Create new account" : "Login with existing account"}
-            </button>
+            </Button>
           </div>
         </form>
       </section>
-    );
-  };
+    </Container >
+  );
+};
 
-  export default AuthForm;
+export default AuthForm;
