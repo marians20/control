@@ -10,7 +10,9 @@ const createToken = (tokenData) =>
     jwt.sign(
         {
             user_id: tokenData.email,
-            email: tokenData.email
+            email: tokenData.email,
+            firstName: tokenData.first_name,
+            lastName: tokenData.last_name
         },
         tokenKey,
         {

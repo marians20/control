@@ -7,6 +7,7 @@ const calculateRemainingTime = (exp) => {
     const remainingDuration = expirationTime - currentTime;
     return remainingDuration;
 };
+
 const AuthContext = React.createContext({
     token: "",
     email: "",
@@ -20,17 +21,19 @@ let logoutTimer;
 export const AuthContextProvider = (props) => {
     const [token, setToken] = useState(null);
     const [email, setEmail] = useState(null);
-    let isLoggedIn = false;
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
 
     useEffect(() => {
         const storedToken = localStorage.getItem("token");
+        const storedEmail = localStorage.getItem("email");
         setToken(storedToken);
-        setEmail(localStorage.getItem("email"));
-        isLoggedIn = !!storedToken;
+        setEmail(storedEmail);
+        setIsLoggedIn(!!storedToken);
     }, []);
 
     const loginHandler = (token, email) => {
         if(!token || !email) {
+            setIsLoggedIn(false);
             return;
         }
         
@@ -43,6 +46,7 @@ export const AuthContextProvider = (props) => {
 
         setToken(token);
         setEmail(email);
+        setIsLoggedIn(!!token);
         window !== 'undefined' && localStorage.setItem("token", token);
         window !== 'undefined' && localStorage.setItem("email", email);
 
@@ -51,15 +55,16 @@ export const AuthContextProvider = (props) => {
         }, remainingTime);
     };
 
-    const logoutHandler = useCallback(() => {
+    const logoutHandler = () => {
         setToken(null);
         setEmail(null);
+        setIsLoggedIn(false);
         window !== 'undefined' && localStorage.removeItem("token");
         window !== 'undefined' && localStorage.removeItem("email");
         if (logoutTimer) {
             clearTimeout(logoutTimer);
         }
-    }, []);
+    };
 
     useEffect(() => {
         if (!token) {

@@ -11,20 +11,20 @@ export default async function login(req, res) {
       const users = db.use('users');
 
       // TODO - learn about CouchDb search or query documents
-      const existingUser = await users.find({ email: email });
+      const existingUser = (await users.find({
+        selector: {
+          email: {"$eq": email}
+        }
+      })).docs[0];
 
-      const encryptedPassword = await bcrypt.hash(password, 10);
-
-      console.log('Existing user', existingUser);
-
-      if (existingUser && existingUser.password === encryptedPassword) {
+      if (existingUser && bcrypt.compareSync(password, existingUser.password)) {
         return res.status(200).json({ token: createToken(existingUser) });
       }
     } catch (err) {
       console.log(err);
       return res.status(401).json(err);
     }
-    console.log('Authentication failure');
-    return res.status(401).json({ message: 'Authentication failure' });
+
+    return res.status(401).json({ message: '[BE] Authentication failure' });
   }
 }

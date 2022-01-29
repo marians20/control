@@ -21,6 +21,12 @@ function MainNavigation() {
                             <li>
                                 <Link href='/lights'>Lights</Link>
                             </li>
+                            <li>
+                                <Thermometer />
+                            </li>
+                            <li>
+                                <Link href='/logout'>{context.email}</Link>
+                            </li>
                         </Fragment>
                     }
                     {!context.isLoggedIn &&
@@ -28,9 +34,6 @@ function MainNavigation() {
                             <Link href='/login'>Login</Link>
                         </li>
                     }
-                    <li>
-                        <Thermometer />
-                    </li>
                 </ul>
             </nav>
         </header>
