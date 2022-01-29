@@ -15,9 +15,3 @@ export default async function read (sensorType, pin) {
     }
     return lastReadValue;
 };
-
-// sensor.read(11, 4, function (err, temperature, humidity) {
-//     if (!err) {
-//         console.log(`temp: ${temperature}°C, humidity: ${humidity}%`);
-//     }
-// });

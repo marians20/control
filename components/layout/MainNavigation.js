@@ -2,6 +2,7 @@ import { useContext, Fragment } from 'react';
 import Link from 'next/link';
 import AuthContext from '../../store/auth-context';
 import classes from './MainNavigation.module.css';
+import Thermometer from '../thermometer/Thermometer';
 
 function MainNavigation() {
     const context = useContext(AuthContext);
@@ -27,6 +28,9 @@ function MainNavigation() {
                             <Link href='/login'>Login</Link>
                         </li>
                     }
+                    <li>
+                        <Thermometer />
+                    </li>
                 </ul>
             </nav>
         </header>

@@ -3,7 +3,6 @@ import read from '../../helpers/dht';
 export default async function dht(req, res) {
     try {
         const value = await read(22, 4);
-        console.log('VALUE', value);
         res.status(200).json({
             time: value.time,
             temperature: value.temperature.toFixed(2),
