@@ -1,5 +1,16 @@
 import read from '../../helpers/dht';
-export default function dht(req, res) {
-    const value = read(22, 4);
-    res.status(200).json(value);
+
+export default async function dht(req, res) {
+    try {
+        const value = await read(22, 4);
+        console.log('VALUE', value);
+        res.status(200).json({
+            time: value.time,
+            temperature: value.temperature.toFixed(2),
+            humidity : value.humidity.toFixed(2)
+        });
+    } catch(error) {
+        console.error('ERROR:', error);
+        return res.status(500).json(error);
+    }
 }

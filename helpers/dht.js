@@ -1,8 +1,19 @@
 var sensor = require("node-dht-sensor");
+sensor.setMaxRetries(3);
 
-export default read = async (sensorType, pin) => {
-    const { err, temperature, humidity } = await sensor.read(sensorType, pin);
-    return {err, temperature, humidity };
+let lastReadValue = {};
+
+export default async function read (sensorType, pin) {
+    console.log(`Reading sensor DHT${sensorType.toString()} at pin ${pin}`);
+    var response = await sensor.read(sensorType, pin);
+    if(response.errors) {
+        throw {errors: response.errors, lastReadValue};
+    }
+    lastReadValue = {
+        ...response,
+        time: new Date()
+    }
+    return lastReadValue;
 };
 
 // sensor.read(11, 4, function (err, temperature, humidity) {
