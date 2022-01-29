@@ -12,6 +12,7 @@
     "nano": "^9.0.5",
     "next": "latest",
     "node-dht-sensor": "^0.4.3",
+    "onoff": "^6.0.3",
     "react": "^17.0.2",
     "react-dom": "^17.0.2"
   },
