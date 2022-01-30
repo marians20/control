@@ -48,7 +48,7 @@ function MainNavigation() {
                                 </Button>
                             </Link>
                             <Thermometer />
-                            <Link href='/login'>
+                            <Link href='/'>
                                 <Button color="inherit"
                                     onClick={clickLogoutHandler}>
                                     {context.email}
@@ -57,7 +57,7 @@ function MainNavigation() {
                         </Fragment>
                     }
                     {!context.isLoggedIn &&
-                        <Link href='/login'>
+                        <Link href='/auth/login'>
                             <Button color="inherit">Login</Button>
                         </Link>
                     }

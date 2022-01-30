@@ -7,7 +7,7 @@ export default function Thermometer() {
     const [temperature, setTemperature] = useState({ temperature: 0, humidity: 0 });
 
     const readDht = useCallback(async function () {
-        const response = await fetch('api/dht');
+        const response = await fetch('/api/dht');
         const data = await response.json();
         if (!data.errors) {
             setTemperature({ temperature: data.temperature, humidity: data.humidity });

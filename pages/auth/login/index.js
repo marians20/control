@@ -5,7 +5,7 @@ import Container from '@mui/material/Container';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 
-import AuthContext from '../../store/auth-context';
+import AuthContext from '../../../store/auth-context';
 import classes from "./AuthForm.module.css";
 
 const initialFormData = {
@@ -15,9 +15,9 @@ const initialFormData = {
   password: ''
 };
 
-const authUrl = '/api';
+const authUrl = '/api/auth';
 const AuthForm = () => {
-  const history = useRouter();
+  const router = useRouter();
   const [formData, setFormData] = useState(initialFormData);
 
   const authContext = useContext(AuthContext);
@@ -53,7 +53,7 @@ const AuthForm = () => {
       }
 
       authContext.login(data.token, email);
-      history.replace('/');
+      router.replace('/');
     } catch (err) {
       setFormData(current => ({ ...current, password: '' }));
       console.log(err);
@@ -89,7 +89,7 @@ const AuthForm = () => {
       }
 
       authContext.login(data.token, email);
-      history.replace('/');
+      router.replace('/');
     } catch (err) {
       console.log(err);
       if (err.message) {
