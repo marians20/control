@@ -22,43 +22,6 @@ const ChangePassword = () => {
     const [formData, setFormData] = useState(initialFormData);
     const [isLoading, setIsLoading] = useState(false);
 
-    const changePassword = async (data) => {
-        setIsLoading(true);
-        try {
-            const response = await fetch(`${authUrl}/changepassword`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    email: data.email,
-                    currentPassword: currentPassword,
-                    newPassword: newPassword,
-                    confirmPassword: confirmPassword,
-                })
-            });
-
-            const data = (await response.json()) || undefined;
-
-            if (!response.ok) {
-                throw data || 'Changing password failed!';
-            }
-
-            authContext.login(data.token, email);
-            router.replace('/');
-        } catch (err) {
-            clearForm();
-            console.log(err);
-            if (err.message) {
-                alert(err.message);
-            } else {
-                alert('Changing password failed!');
-            }
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
     const submitHandler = async (event) => {
         event.preventDefault();
         
@@ -82,8 +45,8 @@ const ChangePassword = () => {
             if (!response.ok) {
                 throw data || 'Changing password failed!';
             }
-
-            authContext.login(data.token, email);
+            alert(data.message);
+            authContext.login(data.token, authContext.email);
             router.replace('/');
         } catch (err) {
             clearForm();
@@ -96,9 +59,7 @@ const ChangePassword = () => {
         } finally {
             setIsLoading(false);
         }
-
         clearForm();
-        router.push('/');
     }
 
     const clearForm = () => {

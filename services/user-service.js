@@ -20,14 +20,13 @@ const UserService = (() => {
             email: user.email.trim().toLowerCase(),
             password: await encryptPassword(user.password)
         }
-
+        
         users.insert(newUser);
 
         return { isSuccess: true };
     }
 
     const getUser = async (email) => {
-        console.log(`getUser (${email})`);
         return (await users.find({
             selector: {
                 email: { "$eq": email.trim().toLowerCase() }
@@ -35,12 +34,11 @@ const UserService = (() => {
         }))?.docs[0];
     }
 
-    const exists = async (email) => !!(await getUser(mail));
+    const exists = async (email) => !!(await getUser(email));
 
     const changePassword = async (data) => {
         const existingUser = await getUser(data.email);
-        console.log(existingUser);
-        
+
         if (data.newPassword !== data.confirmPassword) {
             return {
                 isSuccess: false,
@@ -56,7 +54,7 @@ const UserService = (() => {
                 message: 'User Does not exist'
             };
         }
-        console.log(existingUser);
+
         if (!bcrypt.compareSync(data.currentPassword, existingUser.password)) {
             return {
                 isSuccess: false,
@@ -68,11 +66,14 @@ const UserService = (() => {
         existingUser.password = await encryptPassword(data.newPassword);
 
         const response = await users.insert(existingUser);
-
-        return {
+        const result = {
             isSuccess: response.ok,
-            message: response.message
-        }
+            statusCode: response.ok ? 201: 400,
+            message: response.ok ? 'Password changed' : response.message
+        };
+
+        console.log(result);
+        return result;
     };
 
     const validatePassword = async (email, password) => {
@@ -94,7 +95,7 @@ const UserService = (() => {
             };
         }
 
-        return { isSuccess: true, user : {...existingUser, password: '*******'} };
+        return { isSuccess: true, user: { ...existingUser, password: '*******' } };
     }
 
     return {

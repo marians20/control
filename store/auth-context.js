@@ -66,6 +66,14 @@ export const AuthContextProvider = (props) => {
         }
     };
 
+    const getName = () => {
+        if (!token) {
+            return '';
+        }
+        const decoded = jwtDecode(token);
+        return {firstName: decoded.firstName, lastName: decoded.lastName};
+    }
+
     useEffect(() => {
         if (!token) {
             return;
@@ -82,6 +90,7 @@ export const AuthContextProvider = (props) => {
         token,
         email,
         isLoggedIn,
+        getName,
         login: loginHandler,
         logout: logoutHandler,
     };

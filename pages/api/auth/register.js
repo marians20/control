@@ -3,10 +3,11 @@ import UserService from "../../../services/user-service";
 
 export default async function register(req, res) {
     if (req.method === 'POST') {
+        console.log('req.body', req.body);
         try {
             let newUser = {
-                firstName: req.body.firstName,
-                lastName: req.body.lastName,
+                first_name: req.body.first_name,
+                last_name: req.body.last_name,
                 email: req.body.email,
                 password: req.body.password
             };
