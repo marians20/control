@@ -51,7 +51,7 @@ const UserService = (() => {
             return {
                 isSuccess: false,
                 statusCode: 400,
-                message: 'User Does not exist'
+                message: 'User Does not exist.'
             };
         }
 
@@ -59,7 +59,7 @@ const UserService = (() => {
             return {
                 isSuccess: false,
                 statusCode: 400,
-                message: 'Wrong password.'
+                message: 'The current password you entered does not match.'
             };
         }
 

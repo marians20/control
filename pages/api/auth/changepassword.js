@@ -1,6 +1,9 @@
 import UserService from '../../../services/user-service';
+import middlewareStore from '../../../store/middleware-store';
 
 export default async function handler(req, res) {
+    const middlewareState = middlewareStore.getState();
+    console.log('MIDDLEWARE STATE', middlewareState);
     if (req.method === 'PUT') {
         try {
             const result = await UserService.changePassword(req.body);

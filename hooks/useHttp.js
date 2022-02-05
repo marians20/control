@@ -31,11 +31,18 @@ const useHttp = () => {
                 router.replace('/auth/login');
             }
 
-            const data = await response.json();
+            
             if (!response.ok) {
-                throw new Error( data.message || 'Request failed!' );
+                let err;
+                try {
+                    err = await response.json();
+                } catch {
+                    err = {message: 'Request failed'};
+                }
+                throw new Error( err.message || 'Request failed!' );
             }
 
+            const data = await response.json();
             
             applyData(data);
 

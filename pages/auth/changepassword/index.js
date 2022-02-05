@@ -9,6 +9,8 @@ import Alert from '@mui/material/Alert';
 import Spinner from '../../../components/ui/Spinner';
 import AuthContext from '../../../store/auth-context';
 import useHttp from '../../../hooks/useHttp';
+import useInput from '../../../hooks/useInput';
+import StringUtils from '../../../helpers/string-utils';
 import classes from "./ChangePassword.module.css";
 
 const authUrl = '/api/auth';
@@ -22,13 +24,41 @@ const initialFormData = {
 const ChangePassword = () => {
     const authContext = useContext(AuthContext);
     const router = useRouter();
-    const [formData, setFormData] = useState(initialFormData);
 
     const {
         isLoading,
         error,
         sendRequest,
     } = useHttp();
+
+    const {
+        value: currentPasswordValue,
+        hasError: currentPasswordHasError,
+        isValid: currentPasswordIsValid,
+        reset: resetCurrentPasswordInput,
+        valueChangeHandler: currentPasswordChangedHandler,
+        inputBlurHandler: currentPasswordBlurHandler,
+    } = useInput(StringUtils.isNotEmpty);
+
+    const {
+        value: newPasswordValue,
+        hasError: newPasswordHasError,
+        isValid: newPasswordIsValid,
+        reset: resetNewPasswordInput,
+        valueChangeHandler: newPasswordChangedHandler,
+        inputBlurHandler: newPasswordBlurHandler,
+    } = useInput(StringUtils.isValidPassword);
+
+    const {
+        value: confirmPasswordValue,
+        hasError: confirmPasswordHasError,
+        isValid: confirmPasswordIsValid,
+        reset: resetConfirmPasswordInput,
+        valueChangeHandler: confirmPasswordChangedHandler,
+        inputBlurHandler: confirmPasswordBlurHandler,
+    } = useInput(value => StringUtils.isValidPassword(value) && value === newPasswordValue);
+
+    const isFormValid = currentPasswordIsValid && newPasswordIsValid && confirmPasswordIsValid;
 
     const submitHandler = async (event) => {
         event.preventDefault();
@@ -38,9 +68,9 @@ const ChangePassword = () => {
             method: 'PUT',
             body: {
                 email: authContext.email,
-                currentPassword: formData.currentPassword,
-                newPassword: formData.newPassword,
-                confirmPassword: formData.confirmPassword,
+                currentPassword: currentPasswordValue,
+                newPassword: newPasswordValue,
+                confirmPassword: confirmPasswordValue,
             }
         }, data => {
             alert(data.message);
@@ -50,7 +80,6 @@ const ChangePassword = () => {
         clearForm();
     };
 
-
     const keyUpHandler = (event) => {
         if (event.keyCode === 13) {
             submitHandler(event);
@@ -58,17 +87,10 @@ const ChangePassword = () => {
     };
 
     const clearForm = () => {
-        setFormData(initialFormData);
+        resetCurrentPasswordInput();
+        resetNewPasswordInput();
+        resetConfirmPasswordInput();
     }
-
-    const currentPasswordChangeHandler = (event) =>
-        setFormData(current => ({ ...current, currentPassword: event.target.value }));
-
-    const newPasswordChangeHandler = (event) =>
-        setFormData(current => ({ ...current, newPassword: event.target.value }));
-
-    const confirmPasswordChangeHandler = (event) =>
-        setFormData(current => ({ ...current, confirmPassword: event.target.value }));
 
     const cancelHandler = () => {
         clearForm();
@@ -94,8 +116,11 @@ const ChangePassword = () => {
                             label="Current Password"
                             className={classes['text-field']}
                             type="password"
-                            value={formData.currentPassword}
-                            onChange={currentPasswordChangeHandler}
+                            error={currentPasswordHasError}
+                            helperText="Current password is mandatory."
+                            value={currentPasswordValue}
+                            onChange={currentPasswordChangedHandler}
+                            onBlur={currentPasswordBlurHandler}
                         />
                         <TextField
                             required
@@ -103,8 +128,11 @@ const ChangePassword = () => {
                             label="New Password"
                             className={classes['text-field']}
                             type="password"
-                            value={formData.newPassword}
-                            onChange={newPasswordChangeHandler}
+                            error={newPasswordHasError}
+                            helperText="New Password does not meet the requirements."
+                            value={newPasswordValue}
+                            onChange={newPasswordChangedHandler}
+                            onBlur={newPasswordBlurHandler}
                         />
                         <TextField
                             required
@@ -112,13 +140,16 @@ const ChangePassword = () => {
                             label="Confirm Password"
                             className={classes['text-field']}
                             type="password"
-                            value={formData.confirmPassword}
-                            onChange={confirmPasswordChangeHandler}
+                            error={confirmPasswordHasError}
+                            helperText="Password not confirmed."
+                            value={confirmPasswordValue}
+                            onChange={confirmPasswordChangedHandler}
+                            onBlur={confirmPasswordBlurHandler}
                         />
                         <div className={classes.actions}>
-                            <Button onClick={submitHandler}>
+                            {isFormValid && <Button onClick={submitHandler}>
                                 Ok
-                            </Button>
+                            </Button>}
 
                             <Button
                                 type="button"

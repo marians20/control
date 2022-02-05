@@ -10,6 +10,7 @@ import Spinner from '../../../components/ui/Spinner';
 import AuthContext from '../../../store/auth-context';
 import useHttp from '../../../hooks/useHttp';
 import useInput from '../../../hooks/useInput';
+import StringUtils from '../../../helpers/string-utils';
 import classes from "./AuthForm.module.css";
 
 const initialFormData = {
@@ -21,19 +22,9 @@ const initialFormData = {
 
 const authUrl = '/api/auth';
 
-const isNotEmpty = (value) => value.trim() !== '';
-
-const isValidEmail = (email) =>
-  email.match(
-    /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-  );
-
-const isValidPassword = (value) => value.trim().length >= 6;
-
 const AuthForm = () => {
   const router = useRouter();
   const authContext = useContext(AuthContext);
-  //const [formData, setFormData] = useState(initialFormData);
   const [isLogin, setIsLogin] = useState(true);
   const {
     isLoading,
@@ -48,7 +39,7 @@ const AuthForm = () => {
     reset: resetFirstNameInput,
     valueChangeHandler: firstNameChangedHandler,
     inputBlurHandler: firstNameBlurHandler,
-  } = useInput(isNotEmpty);
+  } = useInput(StringUtils.isNotEmpty);
 
   const {
     value: lastNameValue,
@@ -57,7 +48,7 @@ const AuthForm = () => {
     reset: resetLastNameInput,
     valueChangeHandler: lastNameChangedHandler,
     inputBlurHandler: lastNameBlurHandler,
-  } = useInput(isNotEmpty);
+  } = useInput(StringUtils.isNotEmpty);
 
   const {
     value: emailValue,
@@ -66,7 +57,7 @@ const AuthForm = () => {
     reset: resetEmailInput,
     valueChangeHandler: emailChangedHandler,
     inputBlurHandler: emailBlurHandler,
-  } = useInput(isValidEmail);
+  } = useInput(StringUtils.isValidEmail);
 
   const {
     value: passwordValue,
@@ -75,9 +66,10 @@ const AuthForm = () => {
     reset: resetPasswordInput,
     valueChangeHandler: passwordChangedHandler,
     inputBlurHandler: passwordBlurHandler,
-  } = useInput(isValidPassword);
+  } = useInput(StringUtils.isValidPassword);
 
-  let formIsValid = emailIsValid && passwordIsValid && (isLogin || (firstNameIsValid && lastNameIsValid));
+  let formIsValid = emailIsValid && passwordIsValid
+    && (isLogin || (firstNameIsValid && lastNameIsValid));
 
   const switchAuthModeHandler = () => {
     setIsLogin((prevState) => !prevState);
