@@ -9,6 +9,7 @@ import Alert from '@mui/material/Alert';
 import Spinner from '../../../components/ui/Spinner';
 import AuthContext from '../../../store/auth-context';
 import useHttp from '../../../hooks/useHttp';
+import useInput from '../../../hooks/useInput';
 import classes from "./AuthForm.module.css";
 
 const initialFormData = {
@@ -19,10 +20,20 @@ const initialFormData = {
 };
 
 const authUrl = '/api/auth';
+
+const isNotEmpty = (value) => value.trim() !== '';
+
+const isValidEmail = (email) =>
+  email.match(
+    /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+  );
+
+const isValidPassword = (value) => value.trim().length >= 6;
+
 const AuthForm = () => {
   const router = useRouter();
   const authContext = useContext(AuthContext);
-  const [formData, setFormData] = useState(initialFormData);
+  //const [formData, setFormData] = useState(initialFormData);
   const [isLogin, setIsLogin] = useState(true);
   const {
     isLoading,
@@ -30,12 +41,53 @@ const AuthForm = () => {
     sendRequest
   } = useHttp();
 
+  const {
+    value: firstNameValue,
+    hasError: firstNameHasError,
+    isValid: firstNameIsValid,
+    reset: resetFirstNameInput,
+    valueChangeHandler: firstNameChangedHandler,
+    inputBlurHandler: firstNameBlurHandler,
+  } = useInput(isNotEmpty);
+
+  const {
+    value: lastNameValue,
+    hasError: lastNameHasError,
+    isValid: lastNameIsValid,
+    reset: resetLastNameInput,
+    valueChangeHandler: lastNameChangedHandler,
+    inputBlurHandler: lastNameBlurHandler,
+  } = useInput(isNotEmpty);
+
+  const {
+    value: emailValue,
+    hasError: emailHasError,
+    isValid: emailIsValid,
+    reset: resetEmailInput,
+    valueChangeHandler: emailChangedHandler,
+    inputBlurHandler: emailBlurHandler,
+  } = useInput(isValidEmail);
+
+  const {
+    value: passwordValue,
+    hasError: passwordHasError,
+    isValid: passwordIsValid,
+    reset: resetPasswordInput,
+    valueChangeHandler: passwordChangedHandler,
+    inputBlurHandler: passwordBlurHandler,
+  } = useInput(isValidPassword);
+
+  let formIsValid = emailIsValid && passwordIsValid && (isLogin || (firstNameIsValid && lastNameIsValid));
+
   const switchAuthModeHandler = () => {
     setIsLogin((prevState) => !prevState);
   };
 
   const clearForm = () => {
-    setFormData(initialFormData);
+    resetFirstNameInput();
+    resetLastNameInput();
+    resetEmailInput();
+    resetPasswordInput();
   }
 
   const login = async (email, password) => {
@@ -77,24 +129,16 @@ const AuthForm = () => {
   const submitHandler = async (event) => {
     event.preventDefault();
 
+    if (!formIsValid) {
+      return;
+    }
+
     if (isLogin) {
-      await login(formData.email, formData.password);
+      await login(emailValue, passwordValue);
     } else {
-      await register(formData.firstName, formData.lastName, formData.email, formData.password);
+      await register(firstNameValue, lastNameValue, emailValue, passwordValue);
     }
   };
-
-  const firstNameChangeHandler = (event) =>
-    setFormData(current => ({ ...current, firstName: event.target.value }));
-
-  const lastNameChangeHandler = (event) =>
-    setFormData(current => ({ ...current, lastName: event.target.value }));
-
-  const emailChangeHandler = (event) =>
-    setFormData(current => ({ ...current, email: event.target.value }));
-
-  const passwordChangeHandler = (event) =>
-    setFormData(current => ({ ...current, password: event.target.value }));
 
   return (
     <Fragment>
@@ -113,42 +157,54 @@ const AuthForm = () => {
                 <Fragment>
                   <TextField
                     required
+                    error={firstNameHasError}
+                    helperText="First Name should have a value."
                     id="firstName"
                     label="First Name"
-                    className={classes['text-field']}
-                    value={formData.firstName}
-                    onChange={firstNameChangeHandler}
+                    className={`${classes['text-field']}`}
+                    value={firstNameValue}
+                    onChange={firstNameChangedHandler}
+                    onBlur={firstNameBlurHandler}
                   />
                   <TextField
                     required
+                    error={lastNameHasError}
+                    helperText="Last Name should have a value."
                     id="lastName"
                     label="Last Name"
-                    className={classes['text-field']}
-                    value={formData.lastName}
-                    onChange={lastNameChangeHandler}
+                    className={`${classes['text-field']}`}
+                    value={lastNameValue}
+                    onChange={lastNameChangedHandler}
+                    onBlur={lastNameBlurHandler}
                   />
                 </Fragment>
               )}
               <TextField
                 required
+                error={emailHasError}
+                helperText="Invalid email."
                 id="email"
                 label="Email"
                 type="email"
-                className={classes['text-field']}
-                value={formData.email}
-                onChange={emailChangeHandler}
+                className={`${classes['text-field']}`}
+                value={emailValue}
+                onChange={emailChangedHandler}
+                onBlur={emailBlurHandler}
               />
               <TextField
                 required
+                error={passwordHasError}
+                helperText="Invalid password."
                 id="password"
                 label="Password"
                 type="password"
-                className={classes['text-field']}
-                value={formData.password}
-                onChange={passwordChangeHandler}
+                className={`${classes['text-field']}`}
+                value={passwordValue}
+                onChange={passwordChangedHandler}
+                onBlur={passwordBlurHandler}
               />
               <div className={classes.actions}>
-                <Button onClick={submitHandler}>
+                <Button disabled={!formIsValid} onClick={submitHandler}>
                   {isLogin ? "Login" : "Create Account"}
                 </Button>
 

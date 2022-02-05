@@ -20,5 +20,7 @@
   visibility: hidden;
 }
 
-.inputs .actions {
+.invalid {
+  border: 2px solid red;
+  border-radius: 5px;
 }
