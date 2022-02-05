@@ -22,7 +22,11 @@ export default function Thermometer() {
 
     useEffect(() => {
         readDht();
-        setInterval(readDht, 60000);
+        const interval = setInterval(readDht, 60000);
+
+        return(() => {
+            interval && clearInterval(interval);
+        })
     }, []);
 
     return (<div className={`${classes.thermometer} ${error ? classes.error : ''}`}>
