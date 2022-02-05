@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server"
 import { verifyToken } from "../helpers/jwt-utils";
-
-import middlewareStore from '../store/middleware-store';
+import RequestUtils from "../helpers/request-utils";
 
 // const notAuthorizedResponse = () =>
 //     new Response('Auth required', {
@@ -21,23 +20,13 @@ const middleware = (req, ev) => {
         && req.page.name.indexOf('/api/') >= 0
         && req.page.name.indexOf('/auth/login') < 0) {
         try {
-            const authorizationHeader = req.headers.get('authorization');
-            if (!authorizationHeader) {
-                middlewareStore.dispatch({ type: 'RESET_EMAIL' });
-                return notAuthorizedResponse();
-            }
-            const token = authorizationHeader.replace('Bearer ', '');
-            const decoded = verifyToken(token);
-
+            const decoded = RequestUtils.getToken(req);
             if (!decoded) {
-                middlewareStore.dispatch({ type: 'RESET_EMAIL' });
                 return notAuthorizedResponse();
             }
-            
-            middlewareStore.dispatch({type: 'SET_EMAIL', email: decoded.email});
         }
-        catch {
-            middlewareStore.dispatch({ type: 'RESET_EMAIL'});
+        catch(err) {
+            console.error(err);
             return notAuthorizedResponse();
         }
     }

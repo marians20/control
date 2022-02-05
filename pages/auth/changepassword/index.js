@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router';
-import { useContext, useState, Fragment } from 'react';
+import { useContext, Fragment } from 'react';
 
 import Container from '@mui/material/Container';
 import TextField from '@mui/material/TextField';
@@ -14,12 +14,6 @@ import StringUtils from '../../../helpers/string-utils';
 import classes from "./ChangePassword.module.css";
 
 const authUrl = '/api/auth';
-
-const initialFormData = {
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: '',
-};
 
 const ChangePassword = () => {
     const authContext = useContext(AuthContext);
@@ -74,7 +68,6 @@ const ChangePassword = () => {
             }
         }, data => {
             alert(data.message);
-            authContext.login(data.token, authContext.email);
             router.replace('/');
         });
         clearForm();

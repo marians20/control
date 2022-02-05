@@ -1,14 +1,15 @@
 import UserService from '../../../services/user-service';
-import middlewareStore from '../../../store/middleware-store';
+import RequestUtils from '../../../helpers/request-utils';
 
 export default async function handler(req, res) {
-    const middlewareState = middlewareStore.getState();
-    console.log('MIDDLEWARE STATE', middlewareState);
+    const token = RequestUtils.getToken(req);
     if (req.method === 'PUT') {
         try {
+            if(token?.email !== req.body.email) {
+                return res.status(400).json(JSON.stringify({message: 'Email from token is diferrent!'}));
+            }
+            
             const result = await UserService.changePassword(req.body);
-            console.log('result', result);
-            console.log('Returning response 201');
             return result.isSuccess
                 ? res.status(201).json({ message: result.message })
                 : res.status(result.statusCode).json({ message: result.message });
