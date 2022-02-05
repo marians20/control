@@ -4,8 +4,11 @@ import { useContext, useState, Fragment } from 'react';
 import Container from '@mui/material/Container';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
+import Alert from '@mui/material/Alert';
 
+import Spinner from '../../../components/ui/Spinner';
 import AuthContext from '../../../store/auth-context';
+import useHttp from '../../../hooks/useHttp';
 import classes from "./AuthForm.module.css";
 
 const initialFormData = {
@@ -18,12 +21,14 @@ const initialFormData = {
 const authUrl = '/api/auth';
 const AuthForm = () => {
   const router = useRouter();
-  const [formData, setFormData] = useState(initialFormData);
-
   const authContext = useContext(AuthContext);
-
+  const [formData, setFormData] = useState(initialFormData);
   const [isLogin, setIsLogin] = useState(true);
-  const [isLoading, setIsLoading] = useState(false);
+  const {
+    isLoading,
+    error,
+    sendRequest
+  } = useHttp();
 
   const switchAuthModeHandler = () => {
     setIsLogin((prevState) => !prevState);
@@ -34,78 +39,44 @@ const AuthForm = () => {
   }
 
   const login = async (email, password) => {
-    try {
-      const response = await fetch(`${authUrl}/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          email: email,
-          password: password
-        })
-      });
-
-      const data = (await response.json()) || undefined;
-
-      if (!response.ok) {
-        throw data || 'Authentication failed!';
+    await sendRequest({
+      url: `${authUrl}/login`,
+      method: 'POST',
+      body: {
+        email: email,
+        password: password
       }
-
+    }, data => {
       authContext.login(data.token, email);
       router.replace('/');
-    } catch (err) {
-      setFormData(current => ({ ...current, password: '' }));
-      console.log(err);
-      if (err.message) {
-        alert(err.message);
-      } else {
-        alert('*Authentication failure');
-      }
-    } finally {
-      setIsLoading(false);
-    }
+    });
   };
 
   const register = async (firstName, lastName, email, password) => {
-    try {
-      const response = await fetch(`${authUrl}/register`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          first_name: firstName,
-          last_name: lastName,
-          email: email,
-          password: password
-        })
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw data;
+    await sendRequest({
+      url: `${authUrl}/register`,
+      method: 'POST',
+      body: {
+        first_name: firstName,
+        last_name: lastName,
+        email: email,
+        password: password
       }
-
+    }, data => {
       authContext.login(data.token, email);
       router.replace('/');
-    } catch (err) {
-      console.log(err);
-      if (err.message) {
-        alert(err.message);
-      } else {
-        alert('*Authentication failure');
-      }
-    } finally {
-      setIsLoading(false);
+    });
+  };
+
+  const keyUpHandler = (event) => {
+    if (event.keyCode === 13) {
+      submitHandler(event);
     }
-  }
+  };
 
   const submitHandler = async (event) => {
     event.preventDefault();
 
-    setIsLoading(true);
     if (isLogin) {
       await login(formData.email, formData.password);
     } else {
@@ -126,69 +97,74 @@ const AuthForm = () => {
     setFormData(current => ({ ...current, password: event.target.value }));
 
   return (
-    <Container className={classes.container}>
-      <header>
-        <h1>{isLogin ? "Login" : "Sign Up"}</h1>
-      </header>
-      <section>
-        <form onSubmit={submitHandler} className={classes.inputs}>
-          {!isLogin && (
-            <Fragment>
+    <Fragment>
+      {error && <Alert severity="error" color="error">
+        {error}
+      </Alert>}
+      <Container className={classes.container}>
+        <header>
+          <h1>{isLogin ? "Login" : "Sign Up"}</h1>
+        </header>
+        <section>
+          {isLoading && <Spinner />}
+          {!isLoading &&
+            <form onSubmit={submitHandler} className={classes.inputs} onKeyUp={keyUpHandler}>
+              {!isLogin && (
+                <Fragment>
+                  <TextField
+                    required
+                    id="firstName"
+                    label="First Name"
+                    className={classes['text-field']}
+                    value={formData.firstName}
+                    onChange={firstNameChangeHandler}
+                  />
+                  <TextField
+                    required
+                    id="lastName"
+                    label="Last Name"
+                    className={classes['text-field']}
+                    value={formData.lastName}
+                    onChange={lastNameChangeHandler}
+                  />
+                </Fragment>
+              )}
               <TextField
                 required
-                id="firstName"
-                label="First Name"
+                id="email"
+                label="Email"
+                type="email"
                 className={classes['text-field']}
-                value={formData.firstName}
-                onChange={firstNameChangeHandler}
+                value={formData.email}
+                onChange={emailChangeHandler}
               />
               <TextField
                 required
-                id="lastName"
-                label="Last Name"
+                id="password"
+                label="Password"
+                type="password"
                 className={classes['text-field']}
-                value={formData.lastName}
-                onChange={lastNameChangeHandler}
+                value={formData.password}
+                onChange={passwordChangeHandler}
               />
-            </Fragment>
-          )}
-          <TextField
-            required
-            id="email"
-            label="Email"
-            type="email"
-            className={classes['text-field']}
-            value={formData.email}
-            onChange={emailChangeHandler}
-          />
-          <TextField
-            required
-            id="password"
-            label="Password"
-            type="password"
-            className={classes['text-field']}
-            value={formData.password}
-            onChange={passwordChangeHandler}
-          />
-          <div className={classes.actions}>
-            {!isLoading && <Fragment>
-              <Button onClick={submitHandler}>
-                {isLogin ? "Login" : "Create Account"}
-              </Button>
+              <div className={classes.actions}>
+                <Button onClick={submitHandler}>
+                  {isLogin ? "Login" : "Create Account"}
+                </Button>
 
-              <Button
-                type="button"
-                className={classes.toggle}
-                onClick={switchAuthModeHandler}
-              >
-                {isLogin ? "Create new account" : "Login with existing account"}
-              </Button>
-            </Fragment>}
-            {isLoading && <p>Sending request...</p>}
-          </div>
-        </form>
-      </section>
-    </Container >
+                <Button
+                  type="button"
+                  className={classes.toggle}
+                  onClick={switchAuthModeHandler}
+                >
+                  {isLogin ? "Create new account" : "Login with existing account"}
+                </Button>
+              </div>
+            </form>
+          }
+        </section>
+      </Container >
+    </Fragment>
   );
 };
 

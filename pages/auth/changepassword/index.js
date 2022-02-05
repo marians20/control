@@ -4,8 +4,11 @@ import { useContext, useState, Fragment } from 'react';
 import Container from '@mui/material/Container';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
+import Alert from '@mui/material/Alert';
 
+import Spinner from '../../../components/ui/Spinner';
 import AuthContext from '../../../store/auth-context';
+import useHttp from '../../../hooks/useHttp';
 import classes from "./ChangePassword.module.css";
 
 const authUrl = '/api/auth';
@@ -20,47 +23,39 @@ const ChangePassword = () => {
     const authContext = useContext(AuthContext);
     const router = useRouter();
     const [formData, setFormData] = useState(initialFormData);
-    const [isLoading, setIsLoading] = useState(false);
+
+    const {
+        isLoading,
+        error,
+        sendRequest,
+    } = useHttp();
 
     const submitHandler = async (event) => {
         event.preventDefault();
-        
-        setIsLoading(true);
-        try {
-            const response = await fetch(`${authUrl}/changepassword`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    email: authContext.email,
-                    currentPassword: formData.currentPassword,
-                    newPassword: formData.newPassword,
-                    confirmPassword: formData.confirmPassword,
-                })
-            });
 
-            const data = (await response.json()) || undefined;
-
-            if (!response.ok) {
-                throw data || 'Changing password failed!';
+        await sendRequest({
+            url: `${authUrl}/changepassword`,
+            method: 'PUT',
+            body: {
+                email: authContext.email,
+                currentPassword: formData.currentPassword,
+                newPassword: formData.newPassword,
+                confirmPassword: formData.confirmPassword,
             }
+        }, data => {
             alert(data.message);
             authContext.login(data.token, authContext.email);
             router.replace('/');
-        } catch (err) {
-            clearForm();
-            console.log(err);
-            if (err.message) {
-                alert(err.message);
-            } else {
-                alert('Changing password failed!');
-            }
-        } finally {
-            setIsLoading(false);
-        }
+        });
         clearForm();
-    }
+    };
+
+
+    const keyUpHandler = (event) => {
+        if (event.keyCode === 13) {
+            submitHandler(event);
+        }
+    };
 
     const clearForm = () => {
         setFormData(initialFormData);
@@ -80,43 +75,47 @@ const ChangePassword = () => {
         router.push('/');
     }
 
-return (
-    <Container className={classes.container}>
-        <header>
-            <h1>Change password</h1>
-        </header>
-        <section>
-            <form onSubmit={submitHandler} className={classes.inputs}>
-                <TextField
-                    required
-                    id="currentPassword"
-                    label="Current Password"
-                    className={classes['text-field']}
-                    type="password"
-                    value={formData.currentPassword}
-                    onChange={currentPasswordChangeHandler}
-                />
-                <TextField
-                    required
-                    id="newPassword"
-                    label="New Password"
-                    className={classes['text-field']}
-                    type="password"
-                    value={formData.newPassword}
-                    onChange={newPasswordChangeHandler}
-                />
-                <TextField
-                    required
-                    id="confirmPassword"
-                    label="Confirm Password"
-                    className={classes['text-field']}
-                    type="password"
-                    value={formData.confirmPassword}
-                    onChange={confirmPasswordChangeHandler}
-                />
-                <div className={classes.actions}>
-                    {!isLoading &&
-                        <Fragment>
+    return (<Fragment>
+        {error && <Alert severity="error" color="error">
+            {error}
+        </Alert>}
+        <Container className={classes.container}>
+            <header>
+                <h1>Change password</h1>
+            </header>
+
+            <section>
+                {isLoading && <Spinner />}
+                {!isLoading &&
+                    <form onSubmit={submitHandler} className={classes.inputs} onKeyUp={keyUpHandler}>
+                        <TextField
+                            required
+                            id="currentPassword"
+                            label="Current Password"
+                            className={classes['text-field']}
+                            type="password"
+                            value={formData.currentPassword}
+                            onChange={currentPasswordChangeHandler}
+                        />
+                        <TextField
+                            required
+                            id="newPassword"
+                            label="New Password"
+                            className={classes['text-field']}
+                            type="password"
+                            value={formData.newPassword}
+                            onChange={newPasswordChangeHandler}
+                        />
+                        <TextField
+                            required
+                            id="confirmPassword"
+                            label="Confirm Password"
+                            className={classes['text-field']}
+                            type="password"
+                            value={formData.confirmPassword}
+                            onChange={confirmPasswordChangeHandler}
+                        />
+                        <div className={classes.actions}>
                             <Button onClick={submitHandler}>
                                 Ok
                             </Button>
@@ -128,14 +127,12 @@ return (
                             >
                                 Cancel
                             </Button>
-                        </Fragment>
-                    }
-                    {isLoading && <p>Sending request...</p>}
-                </div>
-            </form>
-        </section>
-    </Container >
-);
+                        </div>
+                    </form>
+                }
+            </section>
+        </Container >
+    </Fragment>);
 }
 
 export default ChangePassword;

@@ -1,8 +1,12 @@
 .thermometer {
     display: flex;
+    flex-direction: column;
+    width: 5em;
     padding: 3px;
     border: 1px solid rgba(255,255,255,0.5);
     border-radius: 3px;
+    background-color: antiquewhite;
+    color:black;
 }
 
 .item {
@@ -10,9 +14,9 @@
     align-items: center;
 }
 
-.item:nth-child(2) {
+/* .item:nth-child(2) {
     margin-left: 0.5em;
-}
+} */
 
 .icon {
     width: 1em;
@@ -21,4 +25,8 @@
 
 .icon-container {
     width: 1em;
+}
+
+.error {
+    border-color: rgb(255, 195, 195);
 }

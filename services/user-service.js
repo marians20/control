@@ -42,7 +42,7 @@ const UserService = (() => {
         if (data.newPassword !== data.confirmPassword) {
             return {
                 isSuccess: false,
-                statusCode: 404,
+                statusCode: 400,
                 message: 'New password not confirmed.'
             };
         }
@@ -50,7 +50,7 @@ const UserService = (() => {
         if (!existingUser) {
             return {
                 isSuccess: false,
-                statusCode: 404,
+                statusCode: 400,
                 message: 'User Does not exist'
             };
         }
@@ -58,7 +58,7 @@ const UserService = (() => {
         if (!bcrypt.compareSync(data.currentPassword, existingUser.password)) {
             return {
                 isSuccess: false,
-                statusCode: 401,
+                statusCode: 400,
                 message: 'Wrong password.'
             };
         }

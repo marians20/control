@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import jwtDecode from "jwt-decode";
 
 const calculateRemainingTime = (exp) => {
@@ -80,7 +80,7 @@ export const AuthContextProvider = (props) => {
         }
         const decoded = jwtDecode(token);
         const remainingTime = calculateRemainingTime(decoded.exp);
-        console.log('AMR', remainingTime);
+        console.log(`AMR ${(remainingTime/60000).toFixed(0)} minute(s)` );
         logoutTimer = setTimeout(() => {
             logoutHandler();
         }, remainingTime);
