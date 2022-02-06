@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState, useContext, Fragment } from 'react';
 import Spinner from '../ui/Spinner';
 import useHttp from '../../hooks/useHttp';
-
+import OpenWeatherAdapter from '../../adapters/open-weather-adapter';
 import classes from './Thermometer.module.css';
 
 export default function Thermometer() {
@@ -12,8 +12,20 @@ export default function Thermometer() {
         sendRequest
     } = useHttp();
 
+    const readWeatherConditions = useCallback(async () => {
+        const weatherConditions = await OpenWeatherAdapter.getCurrentConditions();
+        console.log(weatherConditions);
+    })
+
     const readDht = useCallback(async () => {
-        await sendRequest({ url: '/api/dht' }, data => {
+        await sendRequest({
+            url: '/api/dht',
+            headers: {
+                'Content-Type': 'application/json',
+                'latitude': location.latitude,
+                'longitude': location.longitude
+            }
+        }, data => {
             if (!data.errors) {
                 setTemperature({ temperature: data.temperature, humidity: data.humidity });
             }
@@ -22,6 +34,7 @@ export default function Thermometer() {
 
     useEffect(() => {
         readDht();
+        readWeatherConditions();
         const interval = setInterval(readDht, 60000);
 
         return(() => {

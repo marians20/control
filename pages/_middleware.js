@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { verifyToken } from "../helpers/jwt-utils";
 import RequestUtils from "../helpers/request-utils";
+import GeoLocationAdapter from '../adapters/geolocation-adapter';
 
 // const notAuthorizedResponse = () =>
 //     new Response('Auth required', {
@@ -15,7 +16,9 @@ const notAuthorizedResponse = () =>
         status: 401
     });
 
-const middleware = (req, ev) => {
+let ipAddress = null;
+
+const middleware = async (req, ev) => {
     if (req.page.name
         && req.page.name.indexOf('/api/') >= 0
         && req.page.name.indexOf('/auth/login') < 0) {
