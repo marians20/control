@@ -5,7 +5,7 @@ import OpenWeatherAdapter from '../../adapters/open-weather-adapter';
 import classes from './Thermometer.module.css';
 
 export default function Thermometer() {
-    const [temperature, setTemperature] = useState({ temperature: 0, humidity: 0 });
+    const [temperature, setTemperature] = useState({ temperature: 0, humidity: 0, isDay: true });
     const {
         isLoading,
         error,
@@ -27,7 +27,7 @@ export default function Thermometer() {
             }
         }, data => {
             if (!data.errors) {
-                setTemperature({ temperature: data.temperature, humidity: data.humidity });
+                setTemperature({ temperature: data.temperature, humidity: data.humidity, isDay: data.isDay });
             }
         });
     });
@@ -37,22 +37,28 @@ export default function Thermometer() {
         readWeatherConditions();
         const interval = setInterval(readDht, 60000);
 
-        return(() => {
+        return (() => {
             interval && clearInterval(interval);
         })
     }, []);
 
     return (<div className={`${classes.thermometer} ${error ? classes.error : ''}`}>
-        {isLoading && <Spinner/>}
+        {isLoading && <Spinner />}
         {!isLoading && (
             <Fragment>
                 <div className={classes.item}>
-                    <img src='/Pictures/temperature.svg' alt='T' className={classes.icon} />
-                    {temperature.temperature}℃
+                    {temperature.isDay && <img src='/Pictures/day-sunny.svg' alt='T' className={classes.icon} />}
+                    {!temperature.isDay && <img src='/Pictures/night.svg' alt='T' className={classes.icon} />}
                 </div>
-                <div className={classes.item}>
-                    <img src='/Pictures/humidity.svg' alt='T' className={classes.icon} />
-                    {temperature.humidity}%
+                <div className="container">
+                    <div className={classes.item}>
+                        <img src='/Pictures/temperature.svg' alt='T' className={classes.icon} />
+                        {temperature.temperature}℃
+                    </div>
+                    <div className={classes.item}>
+                        <img src='/Pictures/humidity.svg' alt='T' className={classes.icon} />
+                        {temperature.humidity}%
+                    </div>
                 </div>
             </Fragment>
         )}

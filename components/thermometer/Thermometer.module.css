@@ -1,12 +1,18 @@
 .thermometer {
     display: flex;
-    flex-direction: column;
-    width: 5em;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 7em;
     padding: 3px;
     border: 1px solid rgba(255,255,255,0.5);
     border-radius: 3px;
     background-color: antiquewhite;
     color:black;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;   
 }
 
 .item {
