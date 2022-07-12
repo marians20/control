@@ -6,7 +6,7 @@ import '@fontsource/roboto/700.css';
 import { AuthContextProvider } from '../store/auth-context';
 import { Provider } from 'react-redux';
 import store from '../store';
-import '../styles/globals.css'
+import '../styles/globals.css';
 
 function MyApp({ Component, pageProps }) {
   return (

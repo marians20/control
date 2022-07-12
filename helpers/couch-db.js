@@ -1,20 +1,23 @@
 import  nano from 'nano';
 
 const couchDb = {
-    protocol: 'http',
-    server: 'localhost',
-    port: 5984,
-    user: 'marian',
-    password: 'Fsac1sp@l'
+    protocol: process.env.REACT_API_COUCHDB_PROTOCOL,
+    server: process.env.REACT_API_COUCHDB_SERVER,
+    port: process.env.REACT_API_COUCHDB_PORT,
+    user: process.env.REACT_API_COUCHDB_USER,
+    password: process.env.REACT_API_COUCHDB_PASSWORD
 }
 
 const encodeCredentials = (user, password) =>
  `${encodeURIComponent(user)}:${encodeURIComponent(password)}`;
 
-const createCouchDbUrl = (dbData) =>
+const getAuthenticatedCouchDbUrl = (dbData) =>
     `${dbData.protocol}://${encodeCredentials(dbData.user, dbData.password)}@${dbData.server}:${dbData.port}`;
 
-const couch = nano('http://localhost:5984');
+    const getCouchDbUrl = (dbData) =>
+    `${dbData.protocol}://${dbData.server}:${dbData.port}`;
+
+const couch = nano(getCouchDbUrl(couchDb));
 
 couch.auth(couchDb.user, couchDb.password, (response) => {
     console.log('Couch Db Auth response:', response);

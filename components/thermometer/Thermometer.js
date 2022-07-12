@@ -13,8 +13,8 @@ export default function Thermometer() {
     } = useHttp();
 
     const readWeatherConditions = useCallback(async () => {
-        const weatherConditions = await OpenWeatherAdapter.getCurrentConditions();
-        console.log(weatherConditions);
+        // const weatherConditions = await OpenWeatherAdapter.getCurrentConditions();
+        // console.log(weatherConditions);
     })
 
     const readDht = useCallback(async () => {
@@ -33,13 +33,15 @@ export default function Thermometer() {
     });
 
     useEffect(() => {
+        console.log('In Effect');
         readDht();
-        readWeatherConditions();
+        //readWeatherConditions();
         const interval = setInterval(readDht, 60000);
 
-        return (() => {
+        return () => {
+            console.log('Efect cleanup');
             interval && clearInterval(interval);
-        })
+        };
     }, []);
 
     return (<div className={`${classes.thermometer} ${error ? classes.error : ''}`}>

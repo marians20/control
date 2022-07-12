@@ -1,0 +1,123 @@
+{
+	"info": {
+		"_postman_id": "285f444c-6fe8-4db2-a0b3-007a302037df",
+		"name": "Control",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Daylight",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{server_ip}}:{{api_port}}/api/daylight",
+					"protocol": "http",
+					"host": [
+						"{{server_ip}}"
+					],
+					"port": "{{api_port}}",
+					"path": [
+						"api",
+						"daylight"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"marian.spoiala@gmail.com\",\r\n    \"password\": \"Fsac1sp@l\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{server_ip}}:{{api_port}}/api/auth/login",
+					"protocol": "http",
+					"host": [
+						"{{server_ip}}"
+					],
+					"port": "{{api_port}}",
+					"path": [
+						"api",
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "TurnOnRelay",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://{{server_ip}}:{{api_port}}/api/relays/4/turnRelayOn",
+					"protocol": "http",
+					"host": [
+						"{{server_ip}}"
+					],
+					"port": "{{api_port}}",
+					"path": [
+						"api",
+						"relays",
+						"4",
+						"turnRelayOn"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "oauth2",
+		"oauth2": [
+			{
+				"key": "addTokenTo",
+				"value": "header",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "server_ip",
+			"value": "192.168.1.198",
+			"type": "default"
+		},
+		{
+			"key": "api_port",
+			"value": "3000",
+			"type": "default"
+		}
+	]
+}

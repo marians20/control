@@ -81,6 +81,11 @@ function MainNavigation() {
                 </Typography>
                 {context.isLoggedIn &&
                     <Fragment>
+                        <Link href='/dashboard'>
+                            <Button color="inherit" >
+                                Dashboard
+                            </Button>
+                        </Link>
                         <Link href='/fishtank'>
                             <Button color="inherit" >
                                 FishTank
@@ -91,7 +96,6 @@ function MainNavigation() {
                                 Lights
                             </Button>
                         </Link>
-                        <Thermometer />
                         <Link href='/'>
                             <Button color="inherit"
                                 onClick={handleUserMenuClick}>
@@ -101,6 +105,7 @@ function MainNavigation() {
                         {userMenu}
                     </Fragment>
                 }
+                {/* <Thermometer /> */}
                 {!context.isLoggedIn &&
                     <Link href='/auth/login'>
                         <Button color="inherit">Login</Button>

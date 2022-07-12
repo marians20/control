@@ -1,18 +1,33 @@
-import { setPin, turnOff, turnOn } from '../../../../helpers/gpio';
+import { setPin, turnOff, turnOn, toggle } from '../../../../helpers/gpio';
 
 export default async function relay(req, res) {
-    console.log(req.query);
     const pinNumber = Number(req.query.relayPin);
-    const response = Number(req.query.value) > 0 ? turnRelayOn(pinNumber) : turnRelayOff(pinNumber);
+    let response;
+    switch (Number(req.query.value)) {
+        case 0:
+            response = await turnRelayOff(pinNumber);
+            break;
+        case 1:
+            response = await turnRelayOn(pinNumber);
+            break;
+        default:
+            response = await toggleRelay(pinNumber);
+            break
+    }
     res.status(200).json({ ...req.query, response });
 }
 
-function turnRelayOn(pinNumber) {
+async function turnRelayOn(pinNumber) {
     const pin = setPin(pinNumber, 'out');
-    return turnOn(pin);
+    return await turnOn(pin);
 }
 
-function turnRelayOff(pinNumber) {
-    const pin = setPin(pinNumber, 'out');
-    return turnOff(pin);
+async function turnRelayOff(pinNumber) {
+    let pin = setPin(pinNumber, 'out');
+    return await turnOff(pin);
+}
+
+async function toggleRelay(pinNumber) {
+    let pin = setPin(pinNumber, 'out');
+    return await toggle(pin);
 }
